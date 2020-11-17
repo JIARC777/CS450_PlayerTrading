@@ -25,6 +25,7 @@ public class Trade : MonoBehaviour
 
     public void OnLoggedIn()
     {
+        Debug.Log("Login");
         tradeCanvas.SetActive(true);
         if (onRefreshUI != null)
             onRefreshUI.Invoke();

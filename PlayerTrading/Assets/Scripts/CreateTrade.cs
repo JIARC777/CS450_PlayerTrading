@@ -16,19 +16,17 @@ public class CreateTrade : MonoBehaviour
     {
         instance = this;
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     public void OnCreateTradeButton()
     {
         List<ItemInstance> tempInventory = Trade.instance.inventory;
+      //  foreach (ItemInstance item in tempInventory)
+      //  {
+       //     Debug.Log(item.ItemId);
+       // }
         List<string> itemsToOffer = new List<string>();
-
         foreach (TradeItem item in offeringItems)
         {
+            //Debug.Log();
             for (int x = 0; x < item.value; ++x)
             {
                 ItemInstance i = tempInventory.Find(y => y.DisplayName == item.itemName);
@@ -52,7 +50,7 @@ public class CreateTrade : MonoBehaviour
         List<string> itemsToRequest = new List<string>();
         foreach (TradeItem item in requestingItems)
         {
-            string itemId = ""; // Trade.instance.catalog.Find(y = y.DisplayName == item.itemName.ToString);
+            string itemId = Trade.instance.catalog.Find(y => y.DisplayName == item.itemName).ItemId;
 
             for (int x = 0; x < item.value; ++x)
                 itemsToRequest.Add(itemId);
@@ -72,6 +70,7 @@ public class CreateTrade : MonoBehaviour
 
     void AddTradeToGroup(string tradeId)
     {
+        Debug.Log(tradeId);
         ExecuteCloudScriptRequest executeRequest = new ExecuteCloudScriptRequest
         {
             FunctionName = "AddNewTradeOffer",
@@ -81,6 +80,7 @@ public class CreateTrade : MonoBehaviour
         PlayFabClientAPI.ExecuteCloudScript(executeRequest,
             result =>
             {
+                Debug.Log(result.FunctionResult);
                 Debug.Log("Trade offer created.");
 
                 if (Trade.instance.onRefreshUI != null)
