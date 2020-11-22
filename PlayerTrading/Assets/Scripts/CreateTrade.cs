@@ -19,20 +19,15 @@ public class CreateTrade : MonoBehaviour
     public void OnCreateTradeButton()
     {
         List<ItemInstance> tempInventory = Trade.instance.inventory;
-      //  foreach (ItemInstance item in tempInventory)
-      //  {
-       //     Debug.Log(item.ItemId);
-       // }
         List<string> itemsToOffer = new List<string>();
         foreach (TradeItem item in offeringItems)
         {
-            //Debug.Log();
             for (int x = 0; x < item.value; ++x)
             {
                 ItemInstance i = tempInventory.Find(y => y.DisplayName == item.itemName);
                 if (i == null)
                 {
-                    Debug.Log("You don't have the offered items in your inventory.");
+                    Trade.instance.SetDisplayText("You don't have the offered items in your inventory.", true);
                     return;
                 }
                 else
@@ -44,7 +39,7 @@ public class CreateTrade : MonoBehaviour
         }
         if (itemsToOffer.Count == 0)
         {
-            Debug.Log("You can't trade nothing.");
+            Trade.instance.SetDisplayText("You can't trade nothing.", true);
             return;
         }
         List<string> itemsToRequest = new List<string>();
@@ -64,13 +59,12 @@ public class CreateTrade : MonoBehaviour
 
         PlayFabClientAPI.OpenTrade(tradeRequest,
             result => AddTradeToGroup(result.Trade.TradeId),
-            error => Debug.Log(error.ErrorMessage)
+            error => Trade.instance.SetDisplayText(error.ErrorMessage, true)
         );
     }
 
     void AddTradeToGroup(string tradeId)
     {
-        Debug.Log(tradeId);
         ExecuteCloudScriptRequest executeRequest = new ExecuteCloudScriptRequest
         {
             FunctionName = "AddNewTradeOffer",
@@ -80,13 +74,12 @@ public class CreateTrade : MonoBehaviour
         PlayFabClientAPI.ExecuteCloudScript(executeRequest,
             result =>
             {
-                Debug.Log(result.FunctionResult);
-                Debug.Log("Trade offer created.");
+                Trade.instance.SetDisplayText("Trade offer created.", false);
 
                 if (Trade.instance.onRefreshUI != null)
                     Trade.instance.onRefreshUI.Invoke();
             },
-            error => Debug.Log(error.ErrorMessage)
+            error => Trade.instance.SetDisplayText(error.ErrorMessage, true)
         );
     }
 

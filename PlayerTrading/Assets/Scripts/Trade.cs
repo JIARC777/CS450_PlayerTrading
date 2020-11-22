@@ -18,11 +18,27 @@ public class Trade : MonoBehaviour
 
     public static Trade instance;
     public UnityEvent onRefreshUI;
+
+    public TextMeshProUGUI displayText;
     private void Awake()
     {
         instance = this;
     }
 
+    public void SetDisplayText (string text, bool isError)
+    {
+        displayText.text = text;
+        if (isError)
+            displayText.color = Color.red;
+        else
+            displayText.color = Color.green;
+        Invoke("HideDisplayText", 2.0f);
+    }
+
+    void HideDisplayText()
+    {
+        displayText.text = ""; 
+    }
     public void OnLoggedIn()
     {
         Debug.Log("Login");
@@ -51,7 +67,7 @@ public class Trade : MonoBehaviour
                 foreach (ItemInstance item in inventory)
                     inventoryText.text += item.DisplayName + ", ";
             },
-            error => Debug.Log(error.ErrorMessage)
+            error => Trade.instance.SetDisplayText(error.ErrorMessage, true)
         );
     }
 
@@ -63,7 +79,7 @@ public class Trade : MonoBehaviour
         };
         PlayFabClientAPI.GetCatalogItems(getCatalogRequest,
             result => catalog = result.Catalog,
-            error => Debug.Log(error.ErrorMessage)
+            error => Trade.instance.SetDisplayText(error.ErrorMessage, true)
         );
     }
 }
